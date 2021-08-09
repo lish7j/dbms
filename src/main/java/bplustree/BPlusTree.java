@@ -89,7 +89,6 @@ public class BPlusTree<K extends Comparable<? super K>, V> {
      */
     public void insert(K key, V value) {
         root = root.insertValue(key, value);
-        System.out.println(root.getClass());
     }
 
     /**
@@ -99,7 +98,75 @@ public class BPlusTree<K extends Comparable<? super K>, V> {
      *            the key whose association is to be removed from the tree
      */
     public void delete(K key) {
-        root.deleteValue(key, root);
+        root = root.deleteValue(key);
+    }
+
+    public void printFromEndToStart() {
+        if (root instanceof LeafNode) {
+            LeafNode<K, V> r = (LeafNode<K, V>) root;
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            for (int i = 0; i < r.keys.size(); i++) {
+                sb.append("(").append(r.keys.get(i)).append(", ").append(r.values.get(i)).append(")");
+            }
+            sb.append("}");
+            System.out.println(sb);
+        } else {
+            InternalNode<K, V> r = (InternalNode<K, V>) root;
+            Node child = r;
+            do {
+                r = (InternalNode<K, V>)child;
+                child = r.getFirstChild();
+            } while (child instanceof InternalNode);
+            LeafNode<K, V> first = (LeafNode<K, V>) child;
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            while (first.next != null) {
+                first = first.next;
+            }
+            while (first != null) {
+                sb.append("[");
+                for (int i = 0; i < first.keys.size(); i++) {
+                    sb.append("(").append(first.keys.get(i)).append(", ").append(first.values.get(i)).append(")");
+                }
+                sb.append("]");
+                first = first.before;
+            }
+            sb.append("}");
+            System.out.println(sb);
+        }
+    }
+    public void printList() {
+        if (root instanceof LeafNode) {
+            LeafNode<K, V> r = (LeafNode<K, V>) root;
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            for (int i = 0; i < r.keys.size(); i++) {
+                sb.append("(").append(r.keys.get(i)).append(", ").append(r.values.get(i)).append(")");
+            }
+            sb.append("}");
+            System.out.println(sb);
+        } else {
+            InternalNode<K, V> r = (InternalNode<K, V>) root;
+            Node child = r;
+            do {
+                r = (InternalNode<K, V>)child;
+                child = r.getFirstChild();
+            } while (child instanceof InternalNode);
+            LeafNode<K, V> first = (LeafNode<K, V>) child;
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            while (first != null) {
+                sb.append("[");
+                for (int i = 0; i < first.keys.size(); i++) {
+                    sb.append("(").append(first.keys.get(i)).append(", ").append(first.values.get(i)).append(")");
+                }
+                sb.append("]");
+                first = first.next;
+            }
+            sb.append("}");
+            System.out.println(sb);
+        }
     }
 
     public String toString() {

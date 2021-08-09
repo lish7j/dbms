@@ -9,11 +9,11 @@ import java.util.List;
 public class LeafNode<K extends Comparable<? super K>, V> extends Node<K, V> {
     List<V> values;
     LeafNode<K, V> next;
+    LeafNode<K, V> before;
 
     LeafNode() {
         this.keys = new ArrayList<K>();
         this.values = new ArrayList<V>();
-        this.setParent(null);
     }
 
     @Override
@@ -23,11 +23,21 @@ public class LeafNode<K extends Comparable<? super K>, V> extends Node<K, V> {
     }
 
     @Override
-    void deleteValue(K key, Node root) {
+    Node deleteValue(K key) {
         int loc = Collections.binarySearch(keys, key);
         if (loc >= 0) {
             keys.remove(loc);
             values.remove(loc);
+        }
+        if (keys.size() == 0) {
+            this.before.next = this.next;
+            if (this.next != null)
+                this.next.before = this.before;
+            this.next = null;
+            this.before = null;
+            return null;
+        } else {
+            return this;
         }
     }
 
@@ -47,9 +57,6 @@ public class LeafNode<K extends Comparable<? super K>, V> extends Node<K, V> {
             newRoot.keys.add(this.getFirstLeafKey());
             newRoot.children.add(this);
             newRoot.children.add(sibling);
-            newRoot.setParent(this.getParent());
-            this.setParent(newRoot);
-            sibling.setParent(newRoot);
             return newRoot;
         }
         return this;
@@ -63,8 +70,8 @@ public class LeafNode<K extends Comparable<? super K>, V> extends Node<K, V> {
     @Override
     List<V> getRange(K key1, RangePolicy policy1, K key2,
             RangePolicy policy2) {
-        List<V> result = new LinkedList<V>();
-        LeafNode node = this;
+        List<V> result = new LinkedList<>();
+        LeafNode<K, V> node = this;
         while (node != null) {
             Iterator<K> kIt = node.keys.iterator();
             Iterator<V> vIt = node.values.iterator();
@@ -88,11 +95,27 @@ public class LeafNode<K extends Comparable<? super K>, V> extends Node<K, V> {
 
     @Override
     void merge(Node sibling) {
+        if (sibling == null)
+            return;
+        if (sibling instanceof InternalNode) {
+            LeafNode<K, V> nextLeafNode = this.next;
+            if (nextLeafNode == null)
+                return;
+            K firstKey = nextLeafNode.getFirstLeafKey();
+            //((InternalNode<K, V>) sibling).deleteChild(firstKey);
+            ((InternalNode<K, V>) sibling).deleteValue(firstKey);
+            this.merge(nextLeafNode);
+            return;
+        }
+        if (this == sibling)
+            return;
         @SuppressWarnings("unchecked")
         LeafNode node = (LeafNode) sibling;
         keys.addAll(node.keys);
         values.addAll(node.values);
         next = node.next;
+        if (next != null)
+            node.next.before = this;
     }
 
     /**
@@ -100,7 +123,7 @@ public class LeafNode<K extends Comparable<? super K>, V> extends Node<K, V> {
      */
     @Override
     Node split() {
-        LeafNode sibling = new LeafNode();
+        LeafNode<K, V> sibling = new LeafNode();
         int from = (keyNumber() + 1) / 2, to = keyNumber();
         sibling.keys.addAll(keys.subList(from, to));
         sibling.values.addAll(values.subList(from, to));
@@ -109,6 +132,7 @@ public class LeafNode<K extends Comparable<? super K>, V> extends Node<K, V> {
         values.subList(from, to).clear();
 
         sibling.next = next;
+        sibling.before = this;
         next = sibling;
         return sibling;
     }
