@@ -1,12 +1,10 @@
 package btree;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
+
 
 public class Test {
 
@@ -21,7 +19,6 @@ public class Test {
 
         try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream("tree.ini"));
                 ObjectInputStream i = new ObjectInputStream(new FileInputStream("tree.ini"));) {
-
             o.writeObject(tree);
             BPlusTree<Integer, Integer> p = (BPlusTree<Integer, Integer>)i.readObject();
             System.out.println(p);
@@ -29,16 +26,6 @@ public class Test {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-//        tree.delete(1);
-//        tree.printList();
-//        System.out.println(tree);
-//        tree.delete(2);
-//        tree.printList();
-//        System.out.println(tree);
-//        tree.delete(3);
-//        tree.printList();
-//        System.out.println(tree);
     }
 
 }
