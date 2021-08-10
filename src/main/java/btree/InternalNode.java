@@ -1,5 +1,6 @@
 package btree;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -147,5 +148,27 @@ public class InternalNode<K extends Comparable<? super K>, V> extends Node<K, V>
 
     public Node getFirstChild() {
         return children.get(0);
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.writeInt(keys.size());
+        for (int i = 0; i < keys.size(); i++) {
+            out.writeObject(keys.get(i));
+            out.writeObject(children.get(i));
+        }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int size = in.readInt();
+        if (size > 0) {
+            this.keys = new ArrayList<>(size);
+            this.children = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                K k = (K)in.readObject();
+                Node<K, V> v = (Node<K, V>)in.readObject();
+                keys.add(k);
+                children.add(v);
+            }
+        }
     }
 }

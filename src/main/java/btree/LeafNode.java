@@ -1,10 +1,12 @@
 package btree;
 
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import persistence.BinTree;
 
 public class LeafNode<K extends Comparable<? super K>, V> extends Node<K, V> implements Serializable {
     private static final long serialVersionUID = 7778367429773455679L;
@@ -125,5 +127,32 @@ public class LeafNode<K extends Comparable<? super K>, V> extends Node<K, V> imp
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.writeObject(before);
+        out.writeObject(next);
+        out.writeInt(keys.size());
+        for (int i = 0; i < keys.size(); i++) {
+            out.writeObject(keys.get(i));
+            out.writeObject(values.get(i));
+        }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        before = (LeafNode<K, V>)in.readObject();
+        next = (LeafNode<K, V>)in.readObject();
+        int size = in.readInt();
+        System.out.println("size is " + size);
+        if (size > 0) {
+            this.keys = new ArrayList<>(size);
+            this.values = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                K k = (K)in.readObject();
+                V v = (V)in.readObject();
+                keys.add(k);
+                values.add(v);
+            }
+        }
     }
 }

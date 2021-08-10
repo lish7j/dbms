@@ -1,17 +1,21 @@
 package btree;
 
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class BPlusTree<K extends Comparable<? super K>, V> {
+public class BPlusTree<K extends Comparable<? super K>, V> implements Serializable {
     /**
      * The branching factor used when none specified in constructor.
      */
     private static final int DEFAULT_BRANCHING_FACTOR = 128;
+    private static final long serialVersionUID = -8564706150542232421L;
 
     /**
      * The branching factor for the B+ tree, that measures the capacity of nodes
@@ -178,5 +182,14 @@ public class BPlusTree<K extends Comparable<? super K>, V> {
             queue = nextQueue;
         }
         return sb.toString();
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.writeObject(root);
+
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        root = (Node<K, V>) in.readObject();
     }
 }
