@@ -8,8 +8,8 @@ public class InternalNode<K extends Comparable<? super K>, V> extends Node<K, V>
     List<Node<K, V>> children;
 
     InternalNode() {
-        this.keys = new ArrayList<K>();
-        this.children = new ArrayList<Node<K, V>>();
+        this.keys = new ArrayList<>();
+        this.children = new ArrayList<>();
     }
 
     @Override
@@ -23,8 +23,14 @@ public class InternalNode<K extends Comparable<? super K>, V> extends Node<K, V>
     @Override
     Node deleteValue(K key) {
         int childIndex = getChildIndex(key);
-        if (childIndex >= children.size())
+        if (childIndex >= keys.size())
             return this;
+        if (keys.get(childIndex).compareTo(key) > 0) {
+            childIndex--;
+        }
+        if (childIndex < 0) {
+            return this;
+        }
         Node child = children.get(childIndex);
         Node newChild = child.deleteValue(key);
         if (newChild == null) {
@@ -33,8 +39,6 @@ public class InternalNode<K extends Comparable<? super K>, V> extends Node<K, V>
                 this.children.clear();
                 return null;
             }
-            // 是否可以直接删除呢 children.remove(child);
-            //
             for (int i = 0; i < children.size(); i++) {
                 if (i == childIndex)
                     continue;;
@@ -48,21 +52,26 @@ public class InternalNode<K extends Comparable<? super K>, V> extends Node<K, V>
             }
             return this;
         } else if (child.isUnderflow()) {
-            Node childLeftSibling = getChildLeftSibling(key);
-            Node childRightSibling = getChildRightSibling(key);
-            Node left = childLeftSibling != null ? childLeftSibling : child;
-            Node right = childLeftSibling != null ? child
-                    : childRightSibling;
-            left.merge(right);
-            Node node = deleteValue((K)right.getFirstLeafKey());
-
-            if (left.isOverflow()) {
-                Node sibling = left.split();
-                insertChild((K)sibling.getFirstLeafKey(), sibling);
-            }
-            if (keyNumber() == 0 || children.size() == 0) {
-                return null;
-            }
+//            暂不处理
+//            Node childLeftSibling = getChildLeftSibling(key);
+//            Node childRightSibling = getChildRightSibling(key);
+//            Node left = childLeftSibling != null ? childLeftSibling : child;
+//            Node right = childLeftSibling != null ? child
+//                    : childRightSibling;
+//            left.merge(right);
+//            Node node = deleteValue((K)right.getFirstLeafKey());
+//
+//            if (left.isOverflow()) {
+//                Node sibling = left.split();
+//                insertChild((K)sibling.getFirstLeafKey(), sibling);
+//            }
+//            if (keyNumber() == 0 || children.size() == 0) {
+//                return null;
+//            }
+        }
+        this.keys.clear();
+        for (int i = 0; i < children.size(); i++) {
+            this.keys.add(children.get(i).getFirstLeafKey());
         }
         return this;
     }
@@ -85,6 +94,7 @@ public class InternalNode<K extends Comparable<? super K>, V> extends Node<K, V>
         if (isOverflow()) {
             Node sibling = split();
             InternalNode newRoot = new InternalNode();
+            newRoot.keys.add(this.getFirstLeafKey());
             newRoot.keys.add(sibling.getFirstLeafKey());
             newRoot.children.add(this);
             newRoot.children.add(sibling);
@@ -95,6 +105,8 @@ public class InternalNode<K extends Comparable<? super K>, V> extends Node<K, V>
 
     @Override
     K getFirstLeafKey() {
+        if (children.size() == 0)
+            return null;
         return (K)children.get(0).getFirstLeafKey();
     }
 
@@ -143,25 +155,18 @@ public class InternalNode<K extends Comparable<? super K>, V> extends Node<K, V>
         return childIndex;
     }
 
-    Node getChildForDelete(K key) {
-        int loc = Collections.binarySearch(keys, key);
-        int childIndex = loc >= 0 ? loc : -loc - 1;
-        if (loc < children.size()) {
-            return children.get(loc);
-        }
-        return null;
-    }
-
     Node getChild(K key) {
         int loc = Collections.binarySearch(keys, key);
         int childIndex = loc >= 0 ? loc : -loc - 1;
-        if (loc < children.size()) {
-            return children.get(loc);
+        if (childIndex < children.size()) {
+            return children.get(childIndex);
         }
         return null;
     }
 
     Node getFirstChild() {
+        if (children.size() == 0)
+            return null;
         return children.get(0);
     }
 

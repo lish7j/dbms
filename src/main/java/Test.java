@@ -28,19 +28,11 @@ public class Test {
         //Test_delete();
 
 //        Test_deleteValue();
-//        Test_Btree();
-        Socket s = new Socket("127.0.0.1", 8083);
-        BufferedWriter br = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-        br.write("GET / HTTP1.1\r\n");
-        br.write("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.70\n"
-                + "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\n");
-        br.write("Connection: keep-alive\r\n");
-        br.flush();
-        br.close();
+        Test_Btree();
     }
 
     public static void Test_Btree() {
-        BTree<Integer, Integer> bTree = new BTree<>(3);
+        BPlusTree<Integer, Integer> bTree = new BPlusTree<>(3);
         bTree.insert(1,1);
         bTree.insert(2,2);
         bTree.insert(3,3);
@@ -49,13 +41,31 @@ public class Test {
         bTree.insert(6,6);
         bTree.insert(7,7);
         bTree.insert(8,8);
-        System.out.println(bTree);
-        bTree.delete(3);
+//        System.out.println(bTree);
+//        bTree.printList();
+//        bTree.delete(3);
+//        bTree.printList();
+//        System.out.println(bTree);
+//        bTree.delete(2);
+//        bTree.printList();
+//        System.out.println(bTree);
+//        bTree.delete(6);
+//        bTree.printList();
+//        System.out.println(bTree);
+//        bTree.delete(1);
+//        bTree.printList();
+//        System.out.println(bTree);
+//        bTree.delete(4);
+//        bTree.printList();
+//        System.out.println(bTree);
+//        bTree.delete(5);
+//        bTree.printList();
+//        System.out.println(bTree);
+//        System.out.println(bTree.search(2));
         System.out.println(bTree);
         bTree.delete(2);
         System.out.println(bTree);
-        bTree.delete(6);
-        System.out.println(bTree);
+        bTree.printList();
     }
 
     public static void Test_deleteValue() {

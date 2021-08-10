@@ -1,4 +1,5 @@
-package bplustree;
+package btree;
+
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -54,27 +55,7 @@ public class BPlusTree<K extends Comparable<? super K>, V> {
         return root.getValue(key);
     }
 
-    /**
-     * Returns the values associated with the keys specified by the range:
-     * {@code key1} and {@code key2}.
-     *
-     * @param key1
-     *            the start key of the range
-     * @param policy1
-     *            the range policy, {@link RangePolicy#EXCLUSIVE} or
-     *            {@link RangePolicy#INCLUSIVE}
-     * @param key2
-     *            the end end of the range
-     * @param policy2
-     *            the range policy, {@link RangePolicy#EXCLUSIVE} or
-     *            {@link RangePolicy#INCLUSIVE}
-     * @return the values associated with the keys specified by the range:
-     *         {@code key1} and {@code key2}
-     */
-    public List<V> searchRange(K key1, RangePolicy policy1, K key2,
-            RangePolicy policy2) {
-        return root.getRange(key1, policy1, key2, policy2);
-    }
+
 
     /**
      * Associates the specified value with the specified key in this tree. If
